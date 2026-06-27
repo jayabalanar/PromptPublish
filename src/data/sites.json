@@ -1,0 +1,33 @@
+[
+  {
+    "id": "demo-1",
+    "name": "Acme Marketing Site",
+    "framework": "nextjs",
+    "githubRepo": "acme-corp/marketing",
+    "githubToken": "",
+    "defaultBranch": "main",
+    "stagingBranch": "staging",
+    "siteUrl": "https://acme.com",
+    "updatedAt": "2026-06-20T10:00:00.000Z"
+  },
+  {
+    "id": "demo-2",
+    "name": "TechStartup Blog",
+    "framework": "nextjs",
+    "githubRepo": "techstartup/blog",
+    "githubToken": "",
+    "defaultBranch": "main",
+    "stagingBranch": "preview",
+    "siteUrl": "https://blog.techstartup.io",
+    "updatedAt": "2026-06-18T15:30:00.000Z"
+  },
+  {
+    "id": "demo-wp",
+    "name": "Horizon Creative Agency",
+    "framework": "wordpress",
+    "wpUrl": "https://horizon-creative.example.com",
+    "wpUsername": "demo",
+    "wpAppPassword": "",
+    "updatedAt": "2026-06-25T09:00:00.000Z"
+  }
+]

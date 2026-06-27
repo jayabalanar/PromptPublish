@@ -1,5 +1,4 @@
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
+import { getSiteById } from "@/lib/sites-store";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { WPContentList } from "./wp-content-list";
@@ -10,26 +9,16 @@ type Props = { params: Promise<{ siteId: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { siteId } = await params;
-  const payload = await getPayload({ config });
-  const site = await payload.findByID({ collection: "sites", id: siteId });
+  const site = getSiteById(siteId);
   if (!site) return {};
-  return { title: `${((site as unknown) as { name: string }).name} — WordPress — PromptPublish` };
+  return { title: `${site.name} — WordPress — PromptPublish` };
 }
 
 export default async function WordPressPage({ params }: Props) {
   const { siteId } = await params;
-  const payload = await getPayload({ config });
-  const site = await payload.findByID({ collection: "sites", id: siteId });
-  if (!site) notFound();
+  const site = getSiteById(siteId);
+  if (!site || site.framework !== "wordpress") notFound();
 
-  const s = (site as unknown) as {
-    id: string | number;
-    name: string;
-    framework: string;
-    wpUrl?: string;
-  };
-
-  if (s.framework !== "wordpress") notFound();
-
-  return <WPContentList siteId={String(s.id)} siteName={s.name} wpUrl={s.wpUrl ?? ""} />;
+  const isDemo = !site.wpUsername || !site.wpAppPassword;
+  return <WPContentList siteId={site.id} siteName={site.name} wpUrl={site.wpUrl ?? ""} isDemo={isDemo} />;
 }

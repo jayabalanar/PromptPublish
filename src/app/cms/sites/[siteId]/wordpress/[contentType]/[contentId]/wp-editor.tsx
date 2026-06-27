@@ -74,6 +74,7 @@ export function WPEditor({
   contentId,
   initialItem,
   fetchError,
+  isDemo = false,
 }: {
   siteId: string;
   siteName: string;
@@ -81,6 +82,7 @@ export function WPEditor({
   contentId: number;
   initialItem: WPItem | null;
   fetchError: string;
+  isDemo?: boolean;
 }) {
   const [item, setItem] = useState<WPItem | null>(initialItem);
   const [content, setContent] = useState(initialItem?.content ?? "");
@@ -267,6 +269,12 @@ export function WPEditor({
 
   return (
     <div className="flex flex-col h-full">
+      {isDemo && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-1.5 flex items-center gap-2 shrink-0">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600 bg-amber-500/15 px-1.5 py-0.5 rounded">Demo</span>
+          <span className="text-xs text-amber-700/80">Sample content — connect WordPress credentials to save and publish changes.</span>
+        </div>
+      )}
       {/* Header */}
       <div data-tour="wp-editor-header" className="border-b border-border px-6 py-4 flex items-center gap-4">
         <Link

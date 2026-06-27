@@ -1,5 +1,4 @@
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
+import { getSiteById } from "@/lib/sites-store";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { WPNewForm } from "./wp-new-form";
@@ -17,17 +16,13 @@ export default async function WPNewPage({ params }: Props) {
   const { siteId, contentType } = await params;
   if (contentType !== "posts" && contentType !== "pages") notFound();
 
-  const payload = await getPayload({ config });
-  const site = await payload.findByID({ collection: "sites", id: siteId });
-  if (!site) notFound();
-
-  const s = (site as unknown) as { id: string | number; name: string; framework: string };
-  if (s.framework !== "wordpress") notFound();
+  const site = getSiteById(siteId);
+  if (!site || site.framework !== "wordpress") notFound();
 
   return (
     <WPNewForm
-      siteId={String(s.id)}
-      siteName={s.name}
+      siteId={site.id}
+      siteName={site.name}
       contentType={contentType as "pages" | "posts"}
     />
   );

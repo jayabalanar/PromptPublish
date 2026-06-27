@@ -43,10 +43,12 @@ export function WPContentList({
   siteId,
   siteName,
   wpUrl,
+  isDemo = false,
 }: {
   siteId: string;
   siteName: string;
   wpUrl: string;
+  isDemo?: boolean;
 }) {
   const [tab, setTab] = useState<ContentType>("posts");
   const [data, setData] = useState<ListResult>({ items: [], total: 0 });
@@ -122,6 +124,12 @@ export function WPContentList({
 
   return (
     <div className="flex flex-col h-full">
+      {isDemo && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-8 py-2 flex items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600 bg-amber-500/15 px-1.5 py-0.5 rounded">Demo</span>
+          <span className="text-xs text-amber-700/80">Sample content — connect WordPress credentials to load real posts and pages.</span>
+        </div>
+      )}
       {/* Header */}
       <div data-tour="wp-list-header" className="border-b border-border px-8 py-5">
         <div className="flex items-start justify-between gap-4">

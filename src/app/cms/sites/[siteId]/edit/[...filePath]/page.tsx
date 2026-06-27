@@ -1,9 +1,9 @@
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
+import { getSiteById } from "@/lib/sites-store";
 import { notFound } from "next/navigation";
 import { getFileContent } from "@/lib/github";
 import type { Metadata } from "next";
 import { AIEditor } from "./ai-editor";
+import demoFileContent from "@/data/demo-file-content.json";
 
 export const dynamic = "force-dynamic";
 
@@ -24,26 +24,25 @@ export default async function EditPage({ params, searchParams }: Props) {
   const filePath = filePathParts.map(decodeURIComponent).join("/");
   const pageRoute = typeof sp.route === "string" ? sp.route : "/";
 
-  const payload = await getPayload({ config });
-  const site = await payload.findByID({ collection: "sites", id: siteId });
+  const site = getSiteById(siteId);
   if (!site) notFound();
 
-  const { name, githubRepo, githubToken, defaultBranch, stagingBranch, siteUrl } = (site as unknown) as {
-    name: string;
-    githubRepo: string;
-    githubToken: string;
-    defaultBranch: string;
-    stagingBranch: string;
-    siteUrl?: string;
-  };
+  const { name, githubRepo = "", githubToken = "", defaultBranch = "main", stagingBranch = "staging", siteUrl } = site;
 
   let initialContent = "";
   let fetchError = "";
+  let isDemo = false;
 
-  try {
-    initialContent = await getFileContent(githubToken, githubRepo, defaultBranch, filePath);
-  } catch (err) {
-    fetchError = err instanceof Error ? err.message : "Failed to load file";
+  if (!githubToken) {
+    const siteFiles = (demoFileContent as Record<string, Record<string, string>>)[siteId];
+    initialContent = siteFiles?.[filePath] ?? "// Demo file — connect a GitHub token to load real content.\n";
+    isDemo = true;
+  } else {
+    try {
+      initialContent = await getFileContent(githubToken, githubRepo, defaultBranch, filePath);
+    } catch (err) {
+      fetchError = err instanceof Error ? err.message : "Failed to load file";
+    }
   }
 
   return fetchError ? (
@@ -55,7 +54,7 @@ export default async function EditPage({ params, searchParams }: Props) {
     </div>
   ) : (
     <AIEditor
-      siteId={String(siteId)}
+      siteId={siteId}
       siteName={name}
       filePath={filePath}
       initialContent={initialContent}
@@ -65,6 +64,7 @@ export default async function EditPage({ params, searchParams }: Props) {
       siteId_num={siteId}
       siteUrl={siteUrl ?? ""}
       pageRoute={pageRoute}
+      isDemo={isDemo}
     />
   );
 }

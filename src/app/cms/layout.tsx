@@ -1,26 +1,16 @@
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
+import { getAllSites } from "@/lib/sites-store";
 import { Sidebar } from "@/components/cms/sidebar";
 import { TourProvider } from "@/components/tour";
 
 export const dynamic = "force-dynamic";
 
-async function getSites() {
-  const payload = await getPayload({ config });
-  const result = await payload.find({ collection: "sites", limit: 50, sort: "name" });
-  return result.docs.map((s) => {
-    const site = (s as unknown) as {
-      id: string | number;
-      name: string;
-      githubRepo: string;
-      framework: string;
-    };
-    return { id: site.id, name: site.name, githubRepo: site.githubRepo, framework: site.framework };
-  });
-}
-
-export default async function CMSLayout({ children }: { children: React.ReactNode }) {
-  const sites = await getSites();
+export default function CMSLayout({ children }: { children: React.ReactNode }) {
+  const sites = getAllSites().map((s) => ({
+    id: s.id,
+    name: s.name,
+    githubRepo: s.githubRepo ?? s.wpUrl ?? "",
+    framework: s.framework,
+  }));
 
   return (
     <TourProvider>

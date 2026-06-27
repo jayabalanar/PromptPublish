@@ -1,69 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
 
 export const dynamic = "force-dynamic";
 
-const KEY_FIELDS = ["anthropicKey", "geminiKey", "nvidiaKey", "openaiKey"] as const;
+type AISettings = {
+  provider: string;
+  model: string;
+  anthropicKey: string;
+  geminiKey: string;
+  nvidiaKey: string;
+  openaiKey: string;
+};
 
-function maskKeys(doc: Record<string, unknown>) {
-  const masked = { ...doc };
-  for (const key of KEY_FIELDS) {
-    if (masked[key]) masked[key] = "***";
-  }
-  return masked;
+let settings: AISettings = {
+  provider: "anthropic",
+  model: "claude-sonnet-4-6",
+  anthropicKey: process.env.ANTHROPIC_API_KEY ?? "",
+  geminiKey: "",
+  nvidiaKey: "",
+  openaiKey: "",
+};
+
+function maskKeys(s: AISettings) {
+  return {
+    ...s,
+    anthropicKey: s.anthropicKey ? "***" : "",
+    geminiKey: s.geminiKey ? "***" : "",
+    nvidiaKey: s.nvidiaKey ? "***" : "",
+    openaiKey: s.openaiKey ? "***" : "",
+  };
 }
 
 export async function GET() {
-  try {
-    const payload = await getPayload({ config });
-    const settings = await payload.findGlobal({ slug: "ai-settings" });
-    return NextResponse.json(maskKeys(settings as unknown as Record<string, unknown>));
-  } catch (err) {
-    console.error("[GET /api/cms/settings]", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
+  return NextResponse.json(maskKeys(settings));
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as {
-      provider?: string;
-      model?: string;
-      anthropicKey?: string;
-      geminiKey?: string;
-      nvidiaKey?: string;
-      openaiKey?: string;
-    };
+    const body = await req.json() as Partial<AISettings>;
+    if (body.provider) settings.provider = body.provider;
+    if (body.model) settings.model = body.model;
 
-    const payload = await getPayload({ config });
-
-    // Fetch existing to keep masked/unchanged keys
-    const existing = await payload.findGlobal({ slug: "ai-settings" }) as unknown as Record<string, unknown>;
-
-    const data: Record<string, unknown> = {};
-    if (body.provider) data.provider = body.provider;
-    if (body.model) data.model = body.model;
-
-    // Only update a key if a real value was submitted (not "***" or empty)
-    for (const key of KEY_FIELDS) {
+    for (const key of ["anthropicKey", "geminiKey", "nvidiaKey", "openaiKey"] as const) {
       const val = body[key];
-      if (val && val !== "***") {
-        data[key] = val;
-      } else if (!val) {
-        // Empty string means "clear this key"
-        data[key] = "";
-      } else {
-        // "***" means unchanged — keep existing
-        data[key] = existing[key] ?? "";
-      }
+      if (val === undefined) continue;
+      if (val === "***") continue; // unchanged
+      settings[key] = val;
     }
 
-    const updated = await payload.updateGlobal({ slug: "ai-settings", data });
-    return NextResponse.json(maskKeys(updated as unknown as Record<string, unknown>));
+    return NextResponse.json(maskKeys(settings));
   } catch (err) {
-    console.error("[POST /api/cms/settings]", err);
-    const msg = err instanceof Error ? err.message : "Unexpected error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Unexpected error" }, { status: 500 });
   }
 }

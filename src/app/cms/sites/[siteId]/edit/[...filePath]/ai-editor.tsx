@@ -72,6 +72,7 @@ interface Props {
   filePath: string; initialContent: string;
   stagingBranch: string; githubRepo: string; defaultBranch: string;
   siteUrl: string; pageRoute: string;
+  isDemo?: boolean;
 }
 
 const DEVICE_WIDTHS: Record<DeviceSize, string> = { desktop: "100%", tablet: "768px", mobile: "390px" };
@@ -148,6 +149,7 @@ function CollapsedStrip({ label, icon, onExpand, side = "left" }: {
 export function AIEditor({
   siteId, siteId_num, siteName, filePath, initialContent,
   stagingBranch, githubRepo, defaultBranch, siteUrl, pageRoute,
+  isDemo = false,
 }: Props) {
   // Edit state
   const [prompt, setPrompt] = useState("");
@@ -283,6 +285,12 @@ export function AIEditor({
 
   return (
     <div className="flex flex-col h-screen overflow-hidden select-none">
+      {isDemo && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-1.5 flex items-center gap-2 shrink-0">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600 bg-amber-500/15 px-1.5 py-0.5 rounded">Demo</span>
+          <span className="text-xs text-amber-700/80">Sample file content — connect a GitHub token to load and edit real files.</span>
+        </div>
+      )}
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <header data-tour="editor-header" className="flex items-center gap-3 px-4 py-2.5 border-b border-border bg-card shrink-0 select-text">
         <Link href={`/cms/sites/${siteId_num}`}

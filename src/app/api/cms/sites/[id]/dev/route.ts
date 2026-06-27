@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
+import { getSiteById } from "@/lib/sites-store";
 import { launchSite, stopSite, getState } from "@/lib/site-runner";
 
 export const dynamic = "force-dynamic";
@@ -32,18 +31,10 @@ export async function POST(
         return NextResponse.json({ ok: true, message: "Already in progress" });
       }
 
-      const payload = await getPayload({ config });
-      const site = await payload.findByID({ collection: "sites", id });
+      const site = getSiteById(id);
       if (!site) return NextResponse.json({ error: "Site not found" }, { status: 404 });
 
-      const { githubRepo, githubToken, defaultBranch } = (site as unknown) as {
-        githubRepo: string;
-        githubToken: string;
-        defaultBranch: string;
-      };
-
-      // Fire and forget — client polls GET for status
-      launchSite(id, githubRepo, githubToken, defaultBranch);
+      launchSite(id, site.githubRepo ?? "", site.githubToken ?? "", site.defaultBranch ?? "main");
       return NextResponse.json({ ok: true, status: "cloning" });
     }
 

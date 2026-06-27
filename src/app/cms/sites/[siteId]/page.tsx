@@ -1,10 +1,10 @@
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
+import { getSiteById } from "@/lib/sites-store";
 import { notFound, redirect } from "next/navigation";
 import { getRepoTree, extractPages, detectFramework } from "@/lib/github";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SitePagesTourButton } from "./site-pages-tour";
+import demoPages from "@/data/demo-pages.json";
 
 export const dynamic = "force-dynamic";
 
@@ -12,50 +12,54 @@ type Props = { params: Promise<{ siteId: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { siteId } = await params;
-  const payload = await getPayload({ config });
-  const site = await payload.findByID({ collection: "sites", id: siteId });
+  const site = getSiteById(siteId);
   if (!site) return {};
-  return { title: `${((site as unknown) as { name: string }).name} — PromptPublish` };
+  return { title: `${site.name} — PromptPublish` };
 }
 
 export default async function SitePagesPage({ params }: Props) {
   const { siteId } = await params;
-  const payload = await getPayload({ config });
-  const site = await payload.findByID({ collection: "sites", id: siteId });
+  const site = getSiteById(siteId);
   if (!site) notFound();
 
-  // WordPress sites have their own management UI
-  if (((site as unknown) as { framework: string }).framework === "wordpress") {
+  if (site.framework === "wordpress") {
     redirect(`/cms/sites/${siteId}/wordpress`);
   }
 
-  const { name, githubRepo, githubToken, defaultBranch, stagingBranch, siteUrl } = (site as unknown) as {
-    name: string;
-    githubRepo: string;
-    githubToken: string;
-    defaultBranch: string;
-    stagingBranch: string;
-    siteUrl?: string;
-  };
+  const { name, githubRepo = "", githubToken = "", defaultBranch = "main", stagingBranch = "staging", siteUrl } = site;
 
   let pages: Awaited<ReturnType<typeof extractPages>> = [];
-  let framework = "unknown";
+  let framework = "nextjs-app";
   let fetchError = "";
 
-  try {
-    const [tree, fw] = await Promise.all([
-      getRepoTree(githubToken, githubRepo, defaultBranch),
-      detectFramework(githubToken, githubRepo, defaultBranch),
-    ]);
-    framework = fw;
-    pages = extractPages(tree, framework);
-  } catch (err) {
-    fetchError = err instanceof Error ? err.message : "Failed to load pages";
+  const demoPagesMap = demoPages as Record<string, typeof pages>;
+  const demoFallback = demoPagesMap[siteId];
+
+  if (!githubToken && demoFallback) {
+    pages = demoFallback;
+  } else {
+    try {
+      const [tree, fw] = await Promise.all([
+        getRepoTree(githubToken, githubRepo, defaultBranch),
+        detectFramework(githubToken, githubRepo, defaultBranch),
+      ]);
+      framework = fw;
+      pages = extractPages(tree, framework);
+    } catch (err) {
+      fetchError = err instanceof Error ? err.message : "Failed to load pages";
+    }
   }
+
+  const isDemo = !githubToken && !!demoFallback;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Page header */}
+      {isDemo && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-8 py-2 flex items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600 bg-amber-500/15 px-1.5 py-0.5 rounded">Demo</span>
+          <span className="text-xs text-amber-700/80">Sample pages — connect a GitHub token to load real content.</span>
+        </div>
+      )}
       <div data-tour="site-pages-header" className="border-b border-border px-8 py-5">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -82,16 +86,15 @@ export default async function SitePagesPage({ params }: Props) {
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5 hover:text-foreground hover:border-foreground/20 transition-colors"
             >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-            </svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+              </svg>
               GitHub
             </a>
           </div>
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-auto p-8">
         {fetchError ? (
           <div className="max-w-lg rounded-xl border border-destructive/30 bg-destructive/5 p-5">
@@ -103,11 +106,6 @@ export default async function SitePagesPage({ params }: Props) {
           </div>
         ) : pages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mb-4">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-muted-foreground">
-                <path d="M3 5h14M3 10h8M3 15h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-            </div>
             <p className="text-sm font-medium text-foreground mb-1">No pages detected</p>
             <p className="text-xs text-muted-foreground">
               Framework detected:{" "}
@@ -134,12 +132,9 @@ export default async function SitePagesPage({ params }: Props) {
                     i < pages.length - 1 ? "border-b border-border" : ""
                   }`}
                 >
-                  {/* Route badge */}
                   <code className="shrink-0 text-xs bg-muted text-muted-foreground px-2 py-1 rounded-md font-mono min-w-[3rem] text-center">
                     {page.route === "/" ? "/" : page.route}
                   </code>
-
-                  {/* Label + path */}
                   <div className="flex-1 min-w-0">
                     <span className="text-sm font-medium text-foreground group-hover:text-brand transition-colors">
                       {page.label}
@@ -148,8 +143,6 @@ export default async function SitePagesPage({ params }: Props) {
                       {page.path}
                     </div>
                   </div>
-
-                  {/* Edit arrow */}
                   <span className="text-xs text-muted-foreground/40 group-hover:text-brand/60 transition-colors flex items-center gap-1 shrink-0">
                     Edit
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

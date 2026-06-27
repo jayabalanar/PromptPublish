@@ -1,0 +1,108 @@
+{
+  "demo-wp": {
+    "posts": [
+      {
+        "id": 1,
+        "title": "The Future of Brand Identity in 2026",
+        "slug": "future-brand-identity-2026",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com/future-brand-identity-2026",
+        "modified": "2026-06-24T14:30:00",
+        "excerpt": "How AI-driven design tools are reshaping the way agencies approach brand creation.",
+        "content": "<p>Brand identity has always been the cornerstone of great marketing. In 2026, the tools we use have shifted dramatically...</p>"
+      },
+      {
+        "id": 2,
+        "title": "5 Web Design Trends Dominating This Quarter",
+        "slug": "web-design-trends-q2-2026",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com/web-design-trends-q2-2026",
+        "modified": "2026-06-18T10:15:00",
+        "excerpt": "From bento grid layouts to kinetic typography, here's what's driving engagement.",
+        "content": "<p>Every quarter we see new patterns emerge in web design. This quarter is no exception...</p>"
+      },
+      {
+        "id": 3,
+        "title": "How We Rebuilt Our Client Onboarding Flow",
+        "slug": "client-onboarding-redesign",
+        "status": "draft",
+        "link": "https://horizon-creative.example.com/client-onboarding-redesign",
+        "modified": "2026-06-22T09:00:00",
+        "excerpt": "A behind-the-scenes look at how we cut onboarding time from 3 weeks to 5 days.",
+        "content": "<p>Last year, our client onboarding process was taking far too long...</p>"
+      },
+      {
+        "id": 4,
+        "title": "Case Study: Rebranding NovaTech",
+        "slug": "case-study-novatech-rebrand",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com/case-study-novatech-rebrand",
+        "modified": "2026-06-10T11:45:00",
+        "excerpt": "A complete visual identity overhaul for a B2B SaaS company entering a new market.",
+        "content": "<p>NovaTech came to us with a clear brief: modernise the brand for enterprise buyers...</p>"
+      },
+      {
+        "id": 5,
+        "title": "Motion Design for Marketing: A Primer",
+        "slug": "motion-design-marketing-primer",
+        "status": "pending",
+        "link": "https://horizon-creative.example.com/motion-design-marketing-primer",
+        "modified": "2026-06-26T16:00:00",
+        "excerpt": "Why every brand should be thinking about motion — and how to start.",
+        "content": "<p>Static assets are no longer enough. Motion design has become table stakes...</p>"
+      }
+    ],
+    "pages": [
+      {
+        "id": 10,
+        "title": "Home",
+        "slug": "",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com",
+        "modified": "2026-06-20T08:00:00",
+        "excerpt": "",
+        "content": "<h1>We make brands people remember</h1><p>Horizon Creative is a full-service creative agency specialising in brand, web, and motion.</p>"
+      },
+      {
+        "id": 11,
+        "title": "About Us",
+        "slug": "about",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com/about",
+        "modified": "2026-06-15T12:00:00",
+        "excerpt": "The story of Horizon Creative — who we are and how we work.",
+        "content": "<h1>About Horizon Creative</h1><p>Founded in 2018, we've worked with over 200 brands across technology, retail, and healthcare.</p>"
+      },
+      {
+        "id": 12,
+        "title": "Services",
+        "slug": "services",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com/services",
+        "modified": "2026-06-12T09:30:00",
+        "excerpt": "Brand identity, web design, motion, and campaign strategy.",
+        "content": "<h1>What We Do</h1><p>From initial strategy to final delivery, we handle every stage of the creative process.</p>"
+      },
+      {
+        "id": 13,
+        "title": "Contact",
+        "slug": "contact",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com/contact",
+        "modified": "2026-06-01T10:00:00",
+        "excerpt": "Get in touch with the Horizon team.",
+        "content": "<h1>Let's Talk</h1><p>Ready to start a project? Fill in the form below and we'll be in touch within 24 hours.</p>"
+      },
+      {
+        "id": 14,
+        "title": "Privacy Policy",
+        "slug": "privacy",
+        "status": "publish",
+        "link": "https://horizon-creative.example.com/privacy",
+        "modified": "2026-01-05T08:00:00",
+        "excerpt": "",
+        "content": "<h1>Privacy Policy</h1><p>Last updated January 2026.</p>"
+      }
+    ]
+  }
+}

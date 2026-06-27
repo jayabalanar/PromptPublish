@@ -1,0 +1,18 @@
+{
+  "demo-1": [
+    { "path": "src/app/page.tsx", "label": "Home", "route": "/" },
+    { "path": "src/app/about/page.tsx", "label": "About", "route": "/about" },
+    { "path": "src/app/services/page.tsx", "label": "Services", "route": "/services" },
+    { "path": "src/app/pricing/page.tsx", "label": "Pricing", "route": "/pricing" },
+    { "path": "src/app/case-studies/page.tsx", "label": "Case Studies", "route": "/case-studies" },
+    { "path": "src/app/blog/page.tsx", "label": "Blog", "route": "/blog" },
+    { "path": "src/app/contact/page.tsx", "label": "Contact", "route": "/contact" }
+  ],
+  "demo-2": [
+    { "path": "src/app/page.tsx", "label": "Home", "route": "/" },
+    { "path": "src/app/blog/page.tsx", "label": "Blog Index", "route": "/blog" },
+    { "path": "src/app/blog/[slug]/page.tsx", "label": "Blog Post", "route": "/blog/[slug]" },
+    { "path": "src/app/tags/page.tsx", "label": "Tags", "route": "/tags" },
+    { "path": "src/app/about/page.tsx", "label": "About", "route": "/about" }
+  ]
+}

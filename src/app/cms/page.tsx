@@ -1,5 +1,4 @@
-import { getPayload } from "payload";
-import config from "@/payload/payload.config";
+import { getAllSites } from "@/lib/sites-store";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { DashboardTourButton } from "./dashboard-tour";
@@ -7,14 +6,8 @@ import { DashboardTourButton } from "./dashboard-tour";
 export const metadata: Metadata = { title: "Sites — PromptPublish" };
 export const dynamic = "force-dynamic";
 
-async function getSites() {
-  const payload = await getPayload({ config });
-  const result = await payload.find({ collection: "sites", limit: 100, sort: "-updatedAt" });
-  return result.docs;
-}
-
-export default async function CMSIndexPage() {
-  const sites = await getSites();
+export default function CMSIndexPage() {
+  const sites = getAllSites();
 
   if (sites.length === 0) {
     return (
@@ -69,60 +62,55 @@ export default async function CMSIndexPage() {
       </div>
 
       <div className="grid gap-3">
-        {sites.map((site, i) => {
-          const s = (site as unknown) as {
-            id: string | number;
-            name: string;
-            githubRepo: string;
-            framework: string;
-            defaultBranch: string;
-            stagingBranch: string;
-            updatedAt: string;
-          };
-          return (
-            <Link
-              key={s.id}
-              href={`/cms/sites/${s.id}`}
-              {...(i === 0 ? { "data-tour": "site-card" } : {})}
-              className="group flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-4 hover:border-brand/40 hover:shadow-sm transition-all"
-            >
-              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                <FrameworkBadge framework={s.framework} />
+        {sites.map((site, i) => (
+          <Link
+            key={site.id}
+            href={site.framework === "wordpress" ? `/cms/sites/${site.id}/wordpress` : `/cms/sites/${site.id}`}
+            {...(i === 0 ? { "data-tour": "site-card" } : {})}
+            className="group flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-4 hover:border-brand/40 hover:shadow-sm transition-all"
+          >
+            <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+              <FrameworkBadge framework={site.framework} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-foreground group-hover:text-brand transition-colors leading-none mb-1">
+                {site.name}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-foreground group-hover:text-brand transition-colors leading-none mb-1">
-                  {s.name}
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="font-mono">{s.githubRepo}</span>
-                  <span className="text-border">·</span>
-                  <span>{s.defaultBranch}</span>
-                  {s.stagingBranch && (
-                    <>
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span>{s.stagingBranch}</span>
-                    </>
-                  )}
-                </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                {site.framework === "wordpress" ? (
+                  <span className="font-mono">{site.wpUrl}</span>
+                ) : (
+                  <>
+                    <span className="font-mono">{site.githubRepo}</span>
+                    <span className="text-border">·</span>
+                    <span>{site.defaultBranch}</span>
+                    {site.stagingBranch && (
+                      <>
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5h6M5 2l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>{site.stagingBranch}</span>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
-              <div className="text-xs text-muted-foreground shrink-0">
-                {new Date(s.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-              </div>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-muted-foreground/40 group-hover:text-brand/60 transition-colors shrink-0">
-                <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Link>
-          );
-        })}
+            </div>
+            <div className="text-xs text-muted-foreground shrink-0">
+              {new Date(site.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+            </div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-muted-foreground/40 group-hover:text-brand/60 transition-colors shrink-0">
+              <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
+        ))}
       </div>
     </div>
   );
 }
 
 function FrameworkBadge({ framework }: { framework: string }) {
-  if (framework === "nextjs") {
+  if (framework === "nextjs" || framework === "react") {
     return (
       <svg width="18" height="18" viewBox="0 0 180 180" fill="currentColor" className="text-foreground">
         <mask id="m" style={{ maskType: "alpha" }}>
@@ -147,6 +135,5 @@ function FrameworkBadge({ framework }: { framework: string }) {
       </svg>
     );
   }
-  if (framework === "react") return <span className="text-base">⚛</span>;
   return <span className="text-xs font-bold text-muted-foreground">W</span>;
 }

@@ -544,7 +544,9 @@ export function AIEditor({
                         className="w-full resize-none rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 transition leading-relaxed" />
                       <p className="text-[11px] text-muted-foreground mt-1.5">⌘ Enter to generate</p>
                     </div>
-                    <button data-tour="generate-btn" onClick={runEdit} disabled={!prompt.trim() || isWorking}
+                    <button data-tour="generate-btn" onClick={runEdit} 
+                    disabled={true}
+                    // disabled={!prompt.trim() || isWorking}
                       className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
                       {stage === "generating" ? <><Spinner /> Generating…</> : <>
                         <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>

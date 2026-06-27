@@ -507,7 +507,8 @@ function AIEditPanel({
           <button
             data-tour="wp-generate-btn"
             onClick={onGenerate}
-            disabled={isGenerating || !prompt.trim()}
+            disabled={true}
+            // disabled={isGenerating || !prompt.trim()}
             className="mt-auto flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
           >
             {stage === "generating" ? (

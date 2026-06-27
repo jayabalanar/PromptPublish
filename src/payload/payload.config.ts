@@ -29,6 +29,7 @@ export default buildConfig({
   db: sqliteAdapter({
     client: {
       url: process.env.DATABASE_URL ?? `file:${path.resolve(dirname, "../../payload.db")}`,
+      authToken: process.env.DATABASE_AUTH_TOKEN,
     },
   }),
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3000",

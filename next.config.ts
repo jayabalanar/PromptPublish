@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.vercel.app" },
     ],
   },
-  turbopack: {
-    root: "E:/projects/ByClarity/PromptsApp",
-  },
 };
 
 export default nextConfig;

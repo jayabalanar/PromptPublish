@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
+import { withPayload } from "@payloadcms/next/withPayload";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "**.vercel.app" },
+    ],
+  },
+  turbopack: {
+    resolveAlias: {
+      "@payload-config": "./src/payload/payload.config.ts",
+    },
+  },
 };
 
-export default nextConfig;
+export default withPayload(nextConfig);

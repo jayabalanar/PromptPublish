@@ -9,6 +9,7 @@ type DemoMap = Record<string, { posts: DemoItem[]; pages: DemoItem[] }>;
 type DemoItem = {
   id: number; title: string; slug: string; status: string;
   link: string; modified: string; excerpt: string; content: string;
+  type?: "page" | "post";
 };
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,10 @@ export default async function WPEditorPage({ params }: Props) {
 
   if (!site.wpUsername || !site.wpAppPassword) {
     const demo = (demoWPContent as DemoMap)[siteId];
-    initialItem = demo?.[contentType as "pages" | "posts"]?.find((i: DemoItem) => i.id === numId);
+    const found = demo?.[contentType as "pages" | "posts"]?.find((i: DemoItem) => i.id === numId);
+    if (found) {
+      initialItem = { ...found, type: contentType === "pages" ? "page" : "post" } as import("@/lib/wordpress").WPItem;
+    }
   } else {
     try {
       initialItem = await getWPContent(

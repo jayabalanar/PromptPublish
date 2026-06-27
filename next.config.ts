@@ -8,9 +8,7 @@ const nextConfig: NextConfig = {
     ],
   },
   turbopack: {
-    resolveAlias: {
-      "@payload-config": "./src/payload/payload.config.ts",
-    },
+    root: "E:/projects/ByClarity/PromptsApp",
   },
 };
 
